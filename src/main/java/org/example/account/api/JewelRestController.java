@@ -1,9 +1,12 @@
 package org.example.account.api;
 
+import org.example.account.api.dto.CartItemDto;
 import org.example.account.api.dto.ClientDto;
 import org.example.account.api.dto.OrderDto;
 import org.example.account.api.dto.ProductDto;
+import org.example.account.repository.model.CartItem;
 import org.example.account.repository.model.Client;
+import org.example.account.repository.model.Employee;
 import org.example.account.repository.model.Order;
 import org.example.account.service.JewelService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,20 +46,24 @@ public class JewelRestController {
         try {
             Order order = jewelService.processOrder(orderDto);
             return new ResponseEntity<>(order, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping(path = "/employees", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Employee> createEmployee(@RequestBody Employee employee) {
+        Employee savedEmployee = jewelService.addEmployee(employee);
+        return new ResponseEntity<>(savedEmployee, HttpStatus.CREATED);
+    }
+
+    @PostMapping(path = "/cart/items", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<CartItem> addToCart(@RequestBody CartItemDto dto) {
+        try {
+            CartItem savedItem = jewelService.addToCart(dto);
+            return new ResponseEntity<>(savedItem, HttpStatus.CREATED);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
-    }
-    @PostMapping(path = "/auth/login", consumes = "application/json")
-    public ResponseEntity<String> login(@RequestBody org.example.account.api.dto.ClientDto loginDto) {
-        return ResponseEntity.ok("fake-jwt-token-12345");
-    }
-
-    @GetMapping(path = "/admin/analytics", produces = "application/json")
-    public ResponseEntity<String> getAnalytics(@RequestHeader(value = "Authorization", required = false) String token) {
-        if (token == null) {
-            return new ResponseEntity<>("Доступ заборонено", HttpStatus.FORBIDDEN);
-        }
-        return ResponseEntity.ok("{\"totalSales\": 23500.0}");
     }
 }

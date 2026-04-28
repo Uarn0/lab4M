@@ -9,9 +9,9 @@ import lombok.Setter;
 public class OrderDto {
     private Long id;
     private Long clientId;
+    private Long sellerId;
     private Double amount;
     private String status;
-
     private String cardNumber;
     private String cvv;
 }
